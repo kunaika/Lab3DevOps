@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.x'
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- task: Restore@2
+  inputs:
+    restoreSolution: '**/*.sln'
+
+- task: Build@1
+  inputs:
+    solution: '**/*.sln'
+    msbuildArgs: '/p:Configuration=Release'
+    platform: 'any cpu'
+    configuration: 'Release'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
